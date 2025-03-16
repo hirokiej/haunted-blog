@@ -5,6 +5,7 @@ class BlogsController < ApplicationController
 
   before_action :set_blog, only: %i[show edit update destroy]
   before_action :correct_user, only: %i[edit update destroy]
+  before_action :authenticate_secret_blog, only: %i[show]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -53,7 +54,10 @@ class BlogsController < ApplicationController
   end
 
   def correct_user
-    @user = @blog.user
-    raise ActiveRecord::RecordNotFound if @user != current_user
+    raise ActiveRecord::RecordNotFound if @blog.user != current_user
+  end
+
+  def authenticate_secret_blog
+    raise ActiveRecord::RecordNotFound if @blog.secret && @blog.user != current_user
   end
 end
