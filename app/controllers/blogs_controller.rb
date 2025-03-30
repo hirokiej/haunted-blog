@@ -4,7 +4,7 @@ class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
 
   before_action :set_blog, only: %i[show edit update destroy]
-  before_action :correct_user, only: %i[edit update destroy]
+  before_action :authorize_user, only: %i[edit update destroy]
   before_action :authenticate_secret_blog, only: %i[show]
 
   def index
@@ -56,7 +56,7 @@ class BlogsController < ApplicationController
     params.require(:blog).permit(list_params_allowed)
   end
 
-  def correct_user
+  def authorize_user
     raise ActiveRecord::RecordNotFound if @blog.user != current_user
   end
 
