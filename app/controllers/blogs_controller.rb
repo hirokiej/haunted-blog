@@ -3,15 +3,17 @@
 class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
 
-  before_action :set_blog, only: %i[show edit update destroy]
-  before_action :authorize_user, only: %i[edit update destroy]
+  before_action :set_blog, only: %i[edit update destroy]
   before_action :authorize_secret_blog, only: %i[show]
+
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
   end
 
-  def show; end
+  def show
+    @blog = Blog.find(params[:id])
+  end
 
   def new
     @blog = Blog.new
@@ -46,7 +48,7 @@ class BlogsController < ApplicationController
   private
 
   def set_blog
-    @blog = Blog.find(params[:id])
+    @blog = current_user.blogs.find(params[:id])
   end
 
   def blog_params
@@ -56,9 +58,6 @@ class BlogsController < ApplicationController
     params.require(:blog).permit(list_params_allowed)
   end
 
-  def authorize_user
-    raise ActiveRecord::RecordNotFound if @blog.user != current_user
-  end
 
   def authorize_secret_blog
     raise ActiveRecord::RecordNotFound if @blog.secret && @blog.user != current_user
