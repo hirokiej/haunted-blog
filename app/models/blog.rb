@@ -9,7 +9,7 @@ class Blog < ApplicationRecord
 
   scope :published, -> { where('secret = FALSE') }
 
-  scope :accessible_secret, lambda { |owner|
+  scope :accessible, lambda { |owner|
     where(user: owner).or(published)
   }
 
