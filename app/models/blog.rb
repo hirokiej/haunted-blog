@@ -9,8 +9,12 @@ class Blog < ApplicationRecord
 
   scope :published, -> { where('secret = FALSE') }
 
+  scope :accessible, lambda { |owner|
+    where(user: owner).or(published)
+  }
+
   scope :search, lambda { |term|
-    where("title LIKE '%#{term}%' OR content LIKE '%#{term}%'")
+    where('title LIKE ? OR content LIKE ?', "%#{term}%", "%#{term}%")
   }
 
   scope :default_order, -> { order(id: :desc) }
